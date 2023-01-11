@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Grass Inc: We sell grass</title>
+  </head>
+  <body>
+    <h1>Success!</h1>
+    <p>
+      Ordered <span id="amount">xx</span> m2 of
+      <span id="quality">xx</span> Grass<span id="mole-mesh">
+        and <span id="mesh-amount">xx</span> sheets of mole mesh</span
+      >, for a total of $<span id="total">xx</span>.
+    </p>
+    <br /><br />
+
+    <p>
+      To be delivered to: <br />
+      <span id="street">Streetname</span> <span id="house-nr">1</span>
+      <span id="suffix">A</span> <br />
+      <span id="postal-code">9999ZZ</span> <span id="city">Cityname</span>
+    </p>
+
+    <a href="order-form.html">go back</a>
+  </body>
+
+  <script>
+    const queryString = window.location.search;
+
+    const urlParams = new URLSearchParams(queryString);
+
+    document.getElementById("amount").innerHTML = urlParams.get("amount");
+    document.getElementById("quality").innerHTML = urlParams.get("quality");
+    document.getElementById("total").innerHTML = urlParams.get("total");
+
+    if (urlParams.has("mole-mesh")) {
+      document.getElementById("mesh-amount").innerHTML =
+        urlParams.get("mole-mesh-amount");
+    } else {
+      document.getElementById("mole-mesh").innerHTML = "";
+    }
+
+    document.getElementById("street").innerHTML = urlParams.get("street");
+    if (urlParams.has("suffix")) {
+      document.getElementById("suffix").innerHTML = urlParams.get("suffix");
+    } else {
+      document.getElementById("suffix").innerHTML = "";
+    }
+    document.getElementById("house-nr").innerHTML =
+      urlParams.get("house-number");
+    document.getElementById("postal-code").innerHTML =
+      urlParams.get("postal-code");
+    document.getElementById("city").innerHTML = urlParams.get("city");
+  </script>
+</html>

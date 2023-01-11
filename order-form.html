@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Grass Inc: We sell grass</title>
+    <link rel="stylesheet" href="styles/styles.css" />
+  </head>
+  <body>
+    <main>
+      <form action="success-page.html" method="get" id="order-form">
+        <h1>Order grass</h1>
+        <div class="tab">
+          <h2>Order:</h2>
+          <label for="quality">Grass quality</label>
+          <select name="quality" id="quality" onchange="updatePrice()">
+            <option value="Standard">Standard ($2.95/m2)</option>
+            <option value="Extra">Extra ($3.95/m2)</option>
+            <option value="Premium">Premium ($4.95/m2)</option></select
+          ><br />
+
+          <input
+            type="number"
+            name="amount"
+            id="amount"
+            onchange="updatePrice()"
+            required
+          />
+          <label for="amount">m2</label><br />
+
+          <input
+            type="checkbox"
+            name="mole-mesh"
+            id="mole-mesh"
+            onchange="updatePrice()"
+          />
+          <label for="mole-mesh">Add mole mesh (20x200cm, $2.95/pc)</label
+          ><br />
+          <br />
+          <h2>Total order:</h2>
+          <ul>
+            <li>
+              <p>
+                <span id="amount-show">0</span> m2 of
+                <span id="quality-show">Standard</span> Grass - $<span
+                  id="grass-price"
+                  >0.00</span
+                >
+              </p>
+            </li>
+            <li id="mole-mesh-item" style="opacity: 0">
+              <p>
+                <span id="mole-mesh-count">0</span> sheets of mole mesh - $<span
+                  id="mole-mesh-price"
+                  >0.00</span
+                >
+              </p>
+            </li>
+          </ul>
+          <h3>Total price: $<span id="total-price">0.00</span></h3>
+        </div>
+        <div class="tab">
+          <h2>Shipping address (only in the Netherlands):</h2>
+          <div class="flexbox">
+            <input
+              type="text"
+              name="postal-code"
+              id="postal-code"
+              placeholder="Postal Code"
+              pattern="\d{4}[a-zA-Z]{2}"
+              required
+            /><input
+              type="text"
+              name="house-number"
+              id="house-number"
+              placeholder="House Number"
+              required
+            /><input
+              type="text"
+              name="suffix"
+              id="suffix"
+              placeholder="Suffix"
+            />
+          </div>
+          <input
+            type="text"
+            name="street"
+            id="street"
+            placeholder="Street"
+            required
+          />
+          <br />
+          <input
+            type="text"
+            name="city"
+            id="city"
+            placeholder="City"
+            required
+          />
+        </div>
+        <div class="flexbox">
+          <button type="button" id="prev-button" onclick="showTab(0)">
+            Previous</button
+          ><button type="button" id="next-button" onclick="showTab(1)">
+            Next</button
+          ><button id="submit-button" type="submit">Submit</button>
+        </div>
+        <input type="hidden" name="total" id="total" /><input
+          type="hidden"
+          name="mole-mesh-amount"
+          id="mole-mesh-amount"
+        />
+      </form>
+    </main>
+    <script>
+      let currentTab = 0;
+      const qualityPrices = { Standard: 2.95, Extra: 3.95, Premium: 4.95 };
+
+      showTab(currentTab);
+
+      function showTab(n) {
+        const tabs = document.getElementsByClassName("tab");
+        tabs[currentTab].style.display = "none";
+        tabs[n].style.display = "block";
+
+        currentTab = n;
+
+        if (n == 1) {
+          document.getElementById("prev-button").style.display = "inline";
+          document.getElementById("next-button").style.display = "none";
+          document.getElementById("submit-button").style.display = "inline";
+        } else {
+          document.getElementById("prev-button").style.display = "none";
+          document.getElementById("next-button").style.display = "inline";
+          document.getElementById("submit-button").style.display = "none";
+        }
+      }
+
+      function updatePrice() {
+        const quality = document.getElementById("quality").value;
+        document.getElementById("quality-show").innerHTML = quality;
+        console.log(qualityPrices[quality]);
+        let amount = document.getElementById("amount").value;
+        if (!amount) {
+          amount = 0;
+        }
+        document.getElementById("amount-show").innerHTML = amount;
+        const grassPrice = qualityPrices[quality] * amount;
+        document.getElementById("grass-price").innerHTML =
+          grassPrice.toFixed(2);
+        let totalPrice = grassPrice;
+        if (document.getElementById("mole-mesh").checked) {
+          document.getElementById("mole-mesh-item").style.opacity = 1;
+          const moleMeshCount = Math.ceil(amount / 0.4);
+          document.getElementById("mole-mesh-count").innerHTML = moleMeshCount;
+          document.getElementById("mole-mesh-amount").value = moleMeshCount;
+          const moleMeshPrice = moleMeshCount * 2.95;
+          document.getElementById("mole-mesh-price").innerHTML =
+            moleMeshPrice.toFixed(2);
+          totalPrice += moleMeshPrice;
+        } else {
+          document.getElementById("mole-mesh-item").style.opacity = 0;
+        }
+        document.getElementById("total-price").innerHTML =
+          totalPrice.toFixed(2);
+        document.getElementById("total").value = totalPrice.toFixed(2);
+      }
+
+      function updateAddress() {
+        const postalCode = document.getElementById("postal-code").value;
+        let houseNr = document.getElementById("house-number").value;
+        const suffix = document.getElementById("suffix").value;
+        if (suffix) {
+          houseNr += "-" + suffix;
+        }
+        console.log(houseNr);
+        if (houseNr && postalCode) {
+          const xhttp = new XMLHttpRequest();
+          xhttp.onreadystatechange = function () {
+            if (xhttp.readyState === XMLHttpRequest.DONE) {
+              if (
+                xhttp.status === "OK" ||
+                (xhttp.status >= 200 && xhttp.status < 400)
+              ) {
+                let addressObject = JSON.parse(xhttp.responseText);
+                console.log(addressObject);
+              }
+            }
+          };
+          xhttp.open(
+            "GET",
+            `https://json.api-postcode.nl?postcode=${postalCode}&number=${houseNr}&token=1d3abbdd-1621-4e5c-86f1-a315372e136b`
+          );
+          xhttp.send();
+        }
+      }
+
+      document.getElementById("order-form").onkeypress = function (e) {
+        var key = e.charCode || e.keyCode || 0;
+        if (key == 13) {
+          e.preventDefault();
+        }
+      };
+    </script>
+  </body>
+</html>

@@ -1,0 +1,12 @@
+.flexbox {
+  display: flex;
+  flex-direction: row;
+  width: -webkit-fit-content;
+  width: -moz-fit-content;
+  width: fit-content;
+  justify-content: flex-start;
+}
+
+.tab {
+  display: none;
+}/*# sourceMappingURL=styles.css.map */
